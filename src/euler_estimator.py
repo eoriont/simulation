@@ -40,8 +40,6 @@ class EulerEstimator:
             y_data.append(self.point[1])
 
         for i, y_vals in enumerate(zip(*y_data)):
-            if i % 4 != 0:
-                continue
             plt.plot(x_data, y_vals, zorder=1)
 
         plt.savefig(filename)

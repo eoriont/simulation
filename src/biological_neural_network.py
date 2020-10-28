@@ -14,16 +14,14 @@ class BiologicalNeuralNetwork:
     def get_derivatives(self):
         derivatives = []
 
-        for i, n in enumerate(self.neurons):
-            parents = [j.index for j in self.network.nodes[i].parents]
-            derivatives.append(
-                lambda t, x: n.derivatives[0](
-                    t, x[i*4:(i+1)*4]) + (1/n.C) * sum(x[p*4] for p in parents)
-            )
+        for j, n in enumerate(self.neurons):
+            ps = [j.index for j in self.network.nodes[j].parents]
             derivatives += [
-                (lambda t, x: n.derivatives[1](t, x[i*4:(i+1)*4])),
-                (lambda t, x: n.derivatives[2](t, x[i*4:(i+1)*4])),
-                (lambda t, x: n.derivatives[3](t, x[i*4:(i+1)*4])),
+                (lambda t, x, i=j, n=n, ps=ps: n.derivatives[0](
+                    t, x[i*4:(i+1)*4]) + sum(x[p*4] for p in ps)/n.C),
+                (lambda t, x, i=j, n=n: n.derivatives[1](t, x[i*4:(i+1)*4])),
+                (lambda t, x, i=j, n=n: n.derivatives[2](t, x[i*4:(i+1)*4])),
+                (lambda t, x, i=j, n=n: n.derivatives[3](t, x[i*4:(i+1)*4])),
             ]
         return derivatives
 
@@ -52,19 +50,11 @@ if __name__ == "__main__":
         elif t > 65 and t < 66:
             return 150
         return 0
-    # neuron_0 = BiologicalNeuron(stimulus=electrode_voltage)
-    # neuron_1 = BiologicalNeuron()
-    # neuron_2 = BiologicalNeuron()
-    # neurons = [neuron_0, neuron_1]
-    # synapses = [(0, 1)]
-    # synapses = []
-    #     The neural network resembles a directed graph:
-    # 0 --> 1 --> 2
-
-    neurons = [BiologicalNeuron(stimulus=electrode_voltage)]
-    # neurons = [BiologicalNeuron(
-    #     stimulus=electrode_voltage), BiologicalNeuron()]
-    synapses = []
+    neuron_0 = BiologicalNeuron(stimulus=electrode_voltage)
+    neuron_1 = BiologicalNeuron()
+    neuron_2 = BiologicalNeuron()
+    neurons = [neuron_0, neuron_1, neuron_2]
+    synapses = [(0, 1), (1, 2)]
     network = BiologicalNeuralNetwork(neurons, synapses)
     euler = EulerEstimator(
         derivatives=network.get_derivatives(),
