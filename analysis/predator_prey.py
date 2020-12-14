@@ -5,11 +5,11 @@ try:
 except:
     print("Import failure")
 
-derivatives = [
-    (lambda t, x: 0.6*x[0] - 0.05*x[0]*x[1]),
-    (lambda t, x: -0.9*x[1] + 0.02*x[0]*x[1])
-]
-starting_point = (0, (100, 10))
+derivatives = {
+    'prey': (lambda t, x: 0.6*x['prey'] - 0.05*x['prey']*x['predator']),
+    'predator': (lambda t, x: -0.9*x['predator'] + 0.02*x['prey']*x['predator'])
+}
+starting_point = (0, {'prey': 100, 'predator': 10})
 
 estimator = EulerEstimator(derivatives, starting_point)
 

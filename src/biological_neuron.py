@@ -22,58 +22,50 @@ class BiologicalNeuron:
                             filename=filename)
 
     def get_starting_point(self):
-        # h(0)
         x = 0.07 * (math.e**3 + 1)
-        h_0 = x/(x+1)
-
-        # n(0)
-        n_0 = 1/(1.25*(math.e-1)+1)
-
-        # m(0)
-        m_0 = 2.5/(2.5+4*(math.e**2.5 - 1))
-
-        # V(0)
-        V_0 = 0
-        return 0, (V_0, n_0, m_0, h_0)
+        return 0, {'V': 0,
+                   'n': 1/(1.25*(math.e-1)+1),
+                   'm': 2.5/(2.5+4*(math.e**2.5 - 1)),
+                   'h': x/(x+1)}
 
     def get_derivatives(self):
-        return [self.dV(), BiologicalNeuron.dn, BiologicalNeuron.dm, BiologicalNeuron.dh]
+        return {'V': self.dV(), 'n': BiologicalNeuron.dn, 'm': BiologicalNeuron.dm, 'h': BiologicalNeuron.dh}
 
     @staticmethod
     def a_n(t, x):
-        return 0.01*(10-x[0])/(math.exp(0.1*(10-x[0]))-1)
+        return 0.01*(10-x['V'])/(math.exp(0.1*(10-x['V']))-1)
 
     @staticmethod
     def b_n(t, x):
-        return 0.125*math.exp(-x[0]/80)
+        return 0.125*math.exp(-x['V']/80)
 
     @staticmethod
     def a_m(t, x):
-        return 0.1*(25-x[0])/(math.exp(0.1*(25-x[0]))-1)
+        return 0.1*(25-x['V'])/(math.exp(0.1*(25-x['V']))-1)
 
     @staticmethod
     def b_m(t, x):
-        return 4*math.exp(-x[0]/18)
+        return 4*math.exp(-x['V']/18)
 
     @staticmethod
     def a_h(t, x):
-        return 0.07 * math.exp(-x[0]/20)
+        return 0.07 * math.exp(-x['V']/20)
 
     @staticmethod
     def b_h(t, x):
-        return 1/(math.exp(0.1*(30-x[0]))+1)
+        return 1/(math.exp(0.1*(30-x['V']))+1)
 
     @staticmethod
     def dn(t, x):
-        return BiologicalNeuron.a_n(t, x)*(1 - x[1]) - BiologicalNeuron.b_n(t, x)*x[1]
+        return BiologicalNeuron.a_n(t, x)*(1 - x['n']) - BiologicalNeuron.b_n(t, x)*x['n']
 
     @staticmethod
     def dm(t, x):
-        return BiologicalNeuron.a_m(t, x)*(1 - x[2]) - BiologicalNeuron.b_m(t, x)*x[2]
+        return BiologicalNeuron.a_m(t, x)*(1 - x['m']) - BiologicalNeuron.b_m(t, x)*x['m']
 
     @staticmethod
     def dh(t, x):
-        return BiologicalNeuron.a_h(t, x)*(1 - x[3]) - BiologicalNeuron.b_h(t, x)*x[3]
+        return BiologicalNeuron.a_h(t, x)*(1 - x['h']) - BiologicalNeuron.b_h(t, x)*x['h']
 
     C = 1
     Vna = 115
@@ -85,23 +77,23 @@ class BiologicalNeuron:
 
     @staticmethod
     def INa(t, x):
-        return BiologicalNeuron.gna(t, x)*(x[0]-BiologicalNeuron.Vna)
+        return BiologicalNeuron.gna(t, x)*(x['V']-BiologicalNeuron.Vna)
 
     @staticmethod
     def gna(t, x):
-        return BiologicalNeuron._gna * x[2]**3 * x[3]
+        return BiologicalNeuron._gna * x['m']**3 * x['h']
 
     @staticmethod
     def Ik(t, x):
-        return BiologicalNeuron.gk(t, x)*(x[0]-BiologicalNeuron.Vk)
+        return BiologicalNeuron.gk(t, x)*(x['V']-BiologicalNeuron.Vk)
 
     @staticmethod
     def gk(t, x):
-        return BiologicalNeuron._gk * x[1]**4
+        return BiologicalNeuron._gk * x['n']**4
 
     @staticmethod
     def IL(t, x):
-        return BiologicalNeuron.gl(t, x)*(x[0]-BiologicalNeuron.VL)
+        return BiologicalNeuron.gl(t, x)*(x['V']-BiologicalNeuron.VL)
 
     @staticmethod
     def gl(t, x):
